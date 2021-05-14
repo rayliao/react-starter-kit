@@ -1,0 +1,43 @@
+{{>licenseInfo}}
+import Axios, { AxiosRequestConfig } from 'axios'
+import { makeUseAxios, Options } from 'axios-hooks'
+import { baseURL } from '../config'
+export type AxiosHookConfig = AxiosRequestConfig
+export type AxiosHookOptions = Options
+const config = {
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+  baseURL,
+  timeout: 30000,
+}
+export const axios = Axios.create(config)
+
+export const hookAxios = Axios.create(config)
+
+/**
+ * 创建一个新的useAxios 实例，多个API就不会冲突
+ */
+const useAxios = makeUseAxios({
+  axios: hookAxios,
+  cache: false,
+})
+
+export interface IClientResp<T = any> {
+  code: number
+  body: T
+  msg: string
+}
+
+/**
+ * use request
+ * @param config
+ * @param options
+ */
+export function useRequest<T>(
+  config: AxiosHookConfig | string,
+  options?: AxiosHookOptions,
+) {
+  return useAxios<T>(config, options)
+}
